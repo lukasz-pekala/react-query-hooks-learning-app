@@ -1,13 +1,11 @@
-const { Test, TestingModule } = require("@nestjs/testing");
-const { QuizController } = require("./quiz.controller");
-const { StorageService } = require("../shared/storage.service");
-const { HttpException, HttpStatus } = require("@nestjs/common");
+import { Test, TestingModule } from "@nestjs/testing";
+import { QuizController } from "./quiz.controller";
+import { StorageService } from "../shared/storage.service";
+import { HttpException, HttpStatus } from "@nestjs/common";
 
 describe("QuizController", () => {
-  /** @type {QuizController} */
-  let controller: typeof QuizController;
-  /** @type {StorageService} */
-  let storageService: typeof StorageService;
+  let controller: QuizController;
+  let storageService: StorageService;
 
   const mockStorageService = {
     saveQuizAttempt: jest.fn(),
