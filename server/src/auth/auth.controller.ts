@@ -15,7 +15,8 @@ export class AuthController {
   async register(@Body() userData: InsertUser) {
     try {
       const user = await this.storageService.createUser(userData);
-      return user;
+      const { password, ...result } = user;
+      return result;
     } catch (error) {
       throw new HttpException(
         (error as Error).message,
