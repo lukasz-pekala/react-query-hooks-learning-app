@@ -36,7 +36,7 @@ describe("AuthController", () => {
 
       const mockCreatedUser = {
         id: 1,
-        ...mockUserData,
+        username: "testuser",
       };
 
       mockStorageService.createUser.mockResolvedValue(mockCreatedUser);
