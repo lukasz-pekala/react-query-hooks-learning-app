@@ -16,7 +16,12 @@
     "test:server": "jest -c jest.server.config.cjs",
     "test:client": "jest -c jest.client.config.cjs",
     "test": "npm run test:server && npm run test:client",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "lint:client": "eslint client/ --ext .ts,.tsx",
+    "lint:server": "eslint server/ --ext .ts",
+    "lint:shared": "eslint shared/ --ext .ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
