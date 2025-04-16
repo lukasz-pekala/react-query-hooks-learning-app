@@ -7,9 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build-and-test:
+  setup:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -22,14 +21,96 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Cache dependencies for other jobs
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: cache-npm
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+  build-client:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - name: Build client
         run: npm run build:client
+
+      - name: Cache client build
+        uses: actions/cache@v3
+        with:
+          path: dist/client
+          key: client-build-${{ github.sha }}
+
+  build-server:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Build server
         run: npm run build:server
 
+      - name: Cache server build
+        uses: actions/cache@v3
+        with:
+          path: dist/server
+          key: server-build-${{ github.sha }}
+
+  test-client:
+    needs: build-client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Restore client build
+        uses: actions/cache@v3
+        with:
+          path: dist/client
+          key: client-build-${{ github.sha }}
+
       - name: Run client tests
         run: npm run test:client
+
+  test-server:
+    needs: build-server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Restore server build
+        uses: actions/cache@v3
+        with:
+          path: dist/server
+          key: server-build-${{ github.sha }}
 
       - name: Run server tests
         run: npm run test:server
