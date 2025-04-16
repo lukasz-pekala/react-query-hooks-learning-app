@@ -1,0 +1,298 @@
+openapi: 3.1.0
+info:
+  title: React Query Hooks Learning App API
+  version: 1.0.0
+  description: API for managing user progress, quiz attempts, and authentication
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+components:
+  schemas:
+    Progress:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the progress record
+        userId:
+          type: integer
+          description: ID of the user this progress belongs to
+        tutorialId:
+          type: string
+          description: ID of the tutorial
+        completed:
+          type: boolean
+          description: Whether the tutorial has been completed
+        quizCompleted:
+          type: boolean
+          description: Whether the quiz has been completed
+        lastViewed:
+          type: string
+          format: date-time
+          description: Timestamp of when the tutorial was last viewed
+      required:
+        - userId
+        - tutorialId
+
+    QuizAttempt:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the quiz attempt
+        userId:
+          type: integer
+          description: ID of the user who attempted the quiz
+        tutorialId:
+          type: string
+          description: ID of the tutorial the quiz belongs to
+        score:
+          type: integer
+          description: Score achieved in the quiz (0-100)
+          minimum: 0
+          maximum: 100
+        answers:
+          type: object
+          description: User's answers to quiz questions
+        attemptedAt:
+          type: string
+          format: date-time
+          description: Timestamp of when the quiz was attempted
+      required:
+        - userId
+        - tutorialId
+        - score
+        - answers
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the user
+        username:
+          type: string
+          description: User's login username
+          minLength: 3
+          maxLength: 50
+        password:
+          type: string
+          description: User's password (hashed)
+          minLength: 8
+      required:
+        - username
+        - password
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message describing what went wrong
+
+paths:
+  /api/progress/{userId}:
+    get:
+      summary: Get user progress
+      description: Retrieve all progress records for a specific user
+      operationId: getUserProgress
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the user whose progress to retrieve
+      responses:
+        '200':
+          description: List of user progress
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progress'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/progress:
+    post:
+      summary: Update user progress
+      description: Create or update a user's progress for a tutorial
+      operationId: updateUserProgress
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Progress'
+      responses:
+        '200':
+          description: Updated progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/quiz/attempt:
+    post:
+      summary: Save quiz attempt
+      description: Save a user's quiz attempt with their answers and score
+      operationId: saveQuizAttempt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuizAttempt'
+      responses:
+        '200':
+          description: Saved quiz attempt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttempt'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/quiz/attempts/{userId}/{tutorialId}:
+    get:
+      summary: Get quiz attempts for user and tutorial
+      description: Retrieve all quiz attempts for a specific user and tutorial
+      operationId: getQuizAttempts
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the user whose quiz attempts to retrieve
+        - name: tutorialId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the tutorial whose quiz attempts to retrieve
+      responses:
+        '200':
+          description: List of quiz attempts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuizAttempt'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      description: Create a new user account
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Desired username
+                  minLength: 3
+                  maxLength: 50
+                password:
+                  type: string
+                  description: Desired password
+                  minLength: 8
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Registered user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/login:
+    post:
+      summary: Login user
+      description: Authenticate a user and return their information
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: User's username
+                password:
+                  type: string
+                  description: User's password
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: User's ID
+                  username:
+                    type: string
+                    description: User's username
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error' 

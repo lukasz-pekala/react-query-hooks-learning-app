@@ -7,12 +7,14 @@ An **interactive learning platform** designed to help developers master **React 
 ## Features
 
 ### Frontend
+
 - **Interactive Tutorials**: Learn React Hooks and TanStack Query concepts with step-by-step explanations.
 - **Live Code Examples**: Edit and run code directly in your browser with real-time previews.
 - **Modern UI**: Built with **TailwindCSS** and **Radix UI** for a clean and responsive design.
 - **React Query Integration**: Master data fetching and state synchronization with TanStack Query.
 
 ### Backend
+
 - **RESTful API**: Built with **Express** and **TypeScript**.
 - **Database Integration**: Powered by **Drizzle ORM** and **PostgreSQL**.
 - **Authentication**: Session management with **express-session** and **Passport.js**.
@@ -40,3 +42,4 @@ An **interactive learning platform** designed to help developers master **React 
    ```bash
    git clone https://github.com/your-username/react-hooks-tanstack-query.git
    cd react-hooks-tanstack-query
+   ```
