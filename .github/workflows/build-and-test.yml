@@ -31,8 +31,53 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-  build-client:
+  lint-client:
     needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Run client linting
+        run: npm run lint:client
+
+  lint-server:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Run server linting
+        run: npm run lint:server
+
+  lint-shared:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore cached dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Run shared code linting
+        run: npm run lint:shared
+
+  build-client:
+    needs: [setup, lint-client]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
