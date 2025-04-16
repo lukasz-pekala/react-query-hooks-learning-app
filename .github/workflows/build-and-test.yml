@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Restore cached dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -47,7 +47,7 @@ jobs:
         run: npm run build:client
 
       - name: Cache client build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: dist/client
           key: client-build-${{ github.sha }}
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Restore cached dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -68,7 +68,7 @@ jobs:
         run: npm run build:server
 
       - name: Cache server build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: dist/server
           key: server-build-${{ github.sha }}
@@ -80,13 +80,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Restore cached dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Restore client build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: dist/client
           key: client-build-${{ github.sha }}
@@ -101,13 +101,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Restore cached dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Restore server build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: dist/server
           key: server-build-${{ github.sha }}
