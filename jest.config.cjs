@@ -1,4 +1,10 @@
-/** @type {import('ts-jest').JestConfigWithTsJest} */
+/**
+ * Base Jest configuration file.
+ * This configuration serves as a foundation and may be extended by specific test configurations.
+ * It's primarily maintained for compatibility with the Jest CLI's default config lookup.
+ * For server-specific tests, use jest.server.config.cjs instead.
+ * @type {import('ts-jest').JestConfigWithTsJest}
+ */
 module.exports = {
   moduleFileExtensions: ["js", "json", "ts"],
   rootDir: "server",
@@ -7,7 +13,7 @@ module.exports = {
     "^.+\\.(t|j)s$": [
       "ts-jest",
       {
-        tsconfig: "server/tsconfig.test.json",
+        tsconfig: "tsconfig.test.json",
       },
     ],
   },

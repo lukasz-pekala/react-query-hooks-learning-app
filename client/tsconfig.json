@@ -3,9 +3,13 @@
   "include": ["src/**/*", "../shared/**/*"],
   "exclude": ["node_modules", "build", "dist"],
   "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "outDir": "../dist/client-types",
+    "rootDir": "..",
     "lib": ["esnext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "types": ["vite/client", "jest"],
     "paths": {
       "@/*": ["./src/*"],
