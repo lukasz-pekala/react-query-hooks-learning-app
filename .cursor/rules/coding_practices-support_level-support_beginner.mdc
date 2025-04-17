@@ -1,0 +1,35 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## CODING_PRACTICES
+
+### Guidelines for SUPPORT_LEVEL
+
+#### SUPPORT_BEGINNER
+
+- When running in agent mode, execute up to 3 actions at a time and ask for approval or course correction afterwards.
+- Suggest simpler solutions first, then offer more optimized versions with explanations of the trade-offs.
+- Briefly explain why certain approaches are used and link to relevant documentation or learning resources.
+- When suggesting fixes for errors, explain the root cause and how the solution addresses it to build understanding. Ask for confirmation before proceeding.
+
+
+### Guidelines for DOCUMENTATION
+
+#### DOC_UPDATES
+
+- Update relevant documentation in /docs when modifying features
+- Keep README.md in sync with new capabilities
+- Maintain changelog entries in CHANGELOG.md
+
+
+### Guidelines for VERSION_CONTROL
+
+#### CONVENTIONAL_COMMITS
+
+- Follow the format: type(scope): description for all commit messages
+- Use consistent types (feat, fix, docs, style, refactor, test, chore) across the project
+- Include issue references in commit messages to link changes to requirements
+- Use breaking change footer (!: or BREAKING CHANGE:) to clearly mark incompatible changes
+- Configure commitlint to automatically enforce conventional commit format
