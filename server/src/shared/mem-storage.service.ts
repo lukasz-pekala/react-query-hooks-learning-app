@@ -1,22 +1,15 @@
-import { users, type User, type InsertUser, type Progress, type InsertProgress, type QuizAttempt, type InsertQuizAttempt } from "@shared/schema";
+import { Global, Injectable, OnModuleInit } from "@nestjs/common";
+import {
+  InsertProgress,
+  InsertQuizAttempt,
+  InsertUser,
+  Progress,
+  QuizAttempt,
+  User,
+} from "shared/schema";
 
-// Storage interface for user data, progress, and quiz attempts
-export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  
-  // Progress methods
-  getUserProgress(userId: number): Promise<Progress[]>;
-  updateUserProgress(progress: InsertProgress): Promise<Progress>;
-  
-  // Quiz attempt methods
-  saveQuizAttempt(quizAttempt: InsertQuizAttempt): Promise<QuizAttempt>;
-  getQuizAttempts(userId: number, tutorialId: string): Promise<QuizAttempt[]>;
-}
-
-export class MemStorage implements IStorage {
+@Injectable()
+export class MemStorageService implements OnModuleInit {
   private users: Map<number, User>;
   private progress: Map<number, Progress[]>;
   private quizAttempts: Map<number, QuizAttempt[]>;
@@ -31,9 +24,16 @@ export class MemStorage implements IStorage {
     this.currentUserId = 1;
     this.currentProgressId = 1;
     this.currentQuizAttemptId = 1;
-    
+  }
+
+  // Explanation:
+  // This is a method that is called when the module is initialized.
+  // It is used to add a default user for demonstration purposes.
+  // It must be async because it returns a Promise.
+  // We can't use the constructor to do this because the constructor is called synchronously.
+  async onModuleInit() {
     // Add a default user for demonstration purposes
-    this.createUser({ username: "demo", password: "demo" });
+    await this.createUser({ username: "demo", password: "demo" });
   }
 
   // User methods
@@ -43,7 +43,7 @@ export class MemStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
-      (user) => user.username === username,
+      (user) => user.username === username
     );
   }
 
@@ -56,22 +56,25 @@ export class MemStorage implements IStorage {
 
   // Progress methods
   async getUserProgress(userId: number): Promise<Progress[]> {
+    console.log("getUserProgress", userId);
     return this.progress.get(userId) || [];
   }
 
   async updateUserProgress(insertProgress: InsertProgress): Promise<Progress> {
     const userId = insertProgress.userId;
     const tutorialId = insertProgress.tutorialId;
-    
+
     // Initialize progress array for user if it doesn't exist
     if (!this.progress.has(userId)) {
       this.progress.set(userId, []);
     }
-    
+
     // Check if progress for this tutorial already exists
     const userProgress = this.progress.get(userId)!;
-    const existingProgressIndex = userProgress.findIndex(p => p.tutorialId === tutorialId);
-    
+    const existingProgressIndex = userProgress.findIndex(
+      (p) => p.tutorialId === tutorialId
+    );
+
     if (existingProgressIndex !== -1) {
       // Update existing progress
       const existingProgress = userProgress[existingProgressIndex];
@@ -79,20 +82,21 @@ export class MemStorage implements IStorage {
         ...existingProgress,
         ...insertProgress,
         completed: insertProgress.completed ?? existingProgress.completed,
-        quizCompleted: insertProgress.quizCompleted ?? existingProgress.quizCompleted,
-        lastViewed: insertProgress.lastViewed ?? existingProgress.lastViewed
+        quizCompleted:
+          insertProgress.quizCompleted ?? existingProgress.quizCompleted,
+        lastViewed: insertProgress.lastViewed ?? existingProgress.lastViewed,
       };
       userProgress[existingProgressIndex] = updatedProgress;
       return updatedProgress;
     } else {
       // Create new progress entry
       const id = this.currentProgressId++;
-      const newProgress: Progress = { 
-        ...insertProgress, 
+      const newProgress: Progress = {
+        ...insertProgress,
         id,
         completed: insertProgress.completed ?? false,
         quizCompleted: insertProgress.quizCompleted ?? false,
-        lastViewed: insertProgress.lastViewed ?? null
+        lastViewed: insertProgress.lastViewed ?? null,
       };
       userProgress.push(newProgress);
       return newProgress;
@@ -100,23 +104,27 @@ export class MemStorage implements IStorage {
   }
 
   // Quiz attempt methods
-  async saveQuizAttempt(insertQuizAttempt: InsertQuizAttempt): Promise<QuizAttempt> {
+  async saveQuizAttempt(
+    insertQuizAttempt: InsertQuizAttempt
+  ): Promise<QuizAttempt> {
     const userId = insertQuizAttempt.userId;
-    
+
     // Initialize quiz attempts array for user if it doesn't exist
     if (!this.quizAttempts.has(userId)) {
       this.quizAttempts.set(userId, []);
     }
-    
+
     const id = this.currentQuizAttemptId++;
     const quizAttempt: QuizAttempt = { ...insertQuizAttempt, id };
-    
+
     this.quizAttempts.get(userId)!.push(quizAttempt);
-    
+
     // Update user progress to mark quiz as completed
     const userProgress = this.progress.get(userId) || [];
-    const existingProgressIndex = userProgress.findIndex(p => p.tutorialId === insertQuizAttempt.tutorialId);
-    
+    const existingProgressIndex = userProgress.findIndex(
+      (p) => p.tutorialId === insertQuizAttempt.tutorialId
+    );
+
     if (existingProgressIndex !== -1) {
       userProgress[existingProgressIndex].quizCompleted = true;
     } else {
@@ -127,19 +135,20 @@ export class MemStorage implements IStorage {
         tutorialId: insertQuizAttempt.tutorialId,
         completed: true,
         quizCompleted: true,
-        lastViewed: insertQuizAttempt.attemptedAt
+        lastViewed: insertQuizAttempt.attemptedAt,
       };
       userProgress.push(newProgress);
       this.progress.set(userId, userProgress);
     }
-    
+
     return quizAttempt;
   }
 
-  async getQuizAttempts(userId: number, tutorialId: string): Promise<QuizAttempt[]> {
+  async getQuizAttempts(
+    userId: number,
+    tutorialId: string
+  ): Promise<QuizAttempt[]> {
     const userAttempts = this.quizAttempts.get(userId) || [];
-    return userAttempts.filter(attempt => attempt.tutorialId === tutorialId);
+    return userAttempts.filter((attempt) => attempt.tutorialId === tutorialId);
   }
 }
-
-export const storage = new MemStorage();

@@ -28,7 +28,7 @@ function Router() {
     <MainLayout>
       <Switch>
         <Route path="/" component={Home} />
-        
+
         {/* React Hooks Routes */}
         <Route path="/hooks/use-state" component={UseState} />
         <Route path="/hooks/use-effect" component={UseEffect} />
@@ -38,14 +38,17 @@ function Router() {
         <Route path="/hooks/use-callback" component={UseCallback} />
         <Route path="/hooks/use-reducer" component={UseReducer} />
         <Route path="/hooks/custom-hooks" component={CustomHooks} />
-        
+
         {/* TanStack Query Routes */}
         <Route path="/tanstack/introduction" component={Introduction} />
-        <Route path="/tanstack/query-client-provider" component={QueryClientProviderPage} />
+        <Route
+          path="/tanstack/query-client-provider"
+          component={QueryClientProviderPage}
+        />
         <Route path="/tanstack/use-query" component={UseQueryPage} />
         <Route path="/tanstack/use-mutation" component={UseMutationPage} />
         <Route path="/tanstack/invalidation" component={Invalidation} />
-        
+
         {/* Fallback to 404 */}
         <Route component={NotFound} />
       </Switch>

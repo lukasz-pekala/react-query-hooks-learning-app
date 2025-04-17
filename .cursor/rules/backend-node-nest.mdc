@@ -1,0 +1,41 @@
+---
+description: 
+globs: server/**,*.controller.ts,*.service.ts
+alwaysApply: false
+---
+# NestJS TypeScript Best Practices
+
+## Naming
+- Use PascalCase for all classes and interfaces.
+- Use camelCase for variables, methods, and function names.
+- Use kebab-case for file and directory names.
+
+## Controllers
+- All controllers must use `@Controller()` (without arguments unless absolutely necessary) and appropriate HTTP method decorators.
+- Group related endpoints in the same controller.
+- Do not prefix endpoints with `/api`, instead set `app.setGlobalPrefix("api");` in `main.ts`
+
+## Services
+- All services must be decorated with `@Injectable()`.
+- Use dependency injection for all service dependencies.
+
+## DTOs and Validation
+- Define DTOs for all incoming data using TypeScript classes.
+- Use `@nestjs/class-validator` decorators for property validation.
+- Use Global Pipes for Validation
+Example:
+```ts
+    app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  );
+```
+
+## Error Handling
+- Use NestJS's built-in `HttpException` and custom exception filters.
+
+## Testing
+- Write unit tests for all services and controllers using Jest.

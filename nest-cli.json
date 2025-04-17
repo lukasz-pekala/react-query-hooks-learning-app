@@ -1,0 +1,17 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "server/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "builder": "tsc",
+    "webpack": false,
+    "tsConfigPath": "server/tsconfig.json"
+  },
+  "lint": {
+    "builder": "@nestjs/schematics:eslint",
+    "options": {
+      "config": ".eslintrc.json",
+      "exclude": ["node_modules/**", "dist/**"]
+    }
+  }
+}

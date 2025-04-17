@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["src/**/*", "../shared/**/*"],
+  "exclude": ["node_modules", "build", "dist"],
+  "compilerOptions": {
+    "composite": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2021",
+    "outDir": "../dist/server",
+    "rootDir": "..",
+    "noEmit": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["node", "jest"],
+    "paths": {
+      "@shared/*": ["../shared/*"]
+    }
+  }
+}
