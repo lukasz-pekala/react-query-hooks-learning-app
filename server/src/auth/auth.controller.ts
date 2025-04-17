@@ -5,11 +5,13 @@ import {
   HttpException,
   HttpStatus,
 } from "@nestjs/common";
-import { StorageService, InsertUser } from "../shared/storage.service";
+import { MemStorageService } from "../shared/mem-storage.service";
+import { LoginDto } from "./login.dto";
+import { InsertUser } from "shared/schema";
 
-@Controller("api/auth")
+@Controller()
 export class AuthController {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(private readonly storageService: MemStorageService) {}
 
   @Post("register")
   async register(@Body() userData: InsertUser) {
@@ -26,12 +28,12 @@ export class AuthController {
   }
 
   @Post("login")
-  async login(
-    @Body() { username, password }: { username: string; password: string }
-  ) {
+  async login(@Body() loginDto: LoginDto) {
     try {
-      const user = await this.storageService.getUserByUsername(username);
-      if (!user || user.password !== password) {
+      const user = await this.storageService.getUserByUsername(
+        loginDto.username
+      );
+      if (!user || user.password !== loginDto.password) {
         throw new HttpException("Invalid credentials", HttpStatus.UNAUTHORIZED);
       }
       return { id: user.id, username: user.username };

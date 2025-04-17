@@ -1,4 +1,12 @@
-import { pgTable, text, serial, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  jsonb,
+  date,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -17,11 +25,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
 // Progress tracking schema
 export const progress = pgTable("progress", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   tutorialId: text("tutorial_id").notNull(),
   completed: boolean("completed").default(false),
   quizCompleted: boolean("quiz_completed").default(false),
-  lastViewed: text("last_viewed"),
+  lastViewed: date("last_viewed"), // Explanation: I had to change this because we needed proper validation in ProgressDto
 });
 
 export const insertProgressSchema = createInsertSchema(progress).pick({
@@ -35,7 +45,9 @@ export const insertProgressSchema = createInsertSchema(progress).pick({
 // Quiz attempts schema
 export const quizAttempts = pgTable("quiz_attempts", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   tutorialId: text("tutorial_id").notNull(),
   score: integer("score").notNull(),
   answers: jsonb("answers").notNull(),
