@@ -1,11 +1,13 @@
-import { Test, TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
 import { QuizController } from "./quiz.controller";
-import { StorageService } from "../shared/storage.service";
+import { MemStorageService } from "../shared/mem-storage.service";
 import { HttpException, HttpStatus } from "@nestjs/common";
+import "reflect-metadata";
+import { InsertQuizAttempt } from "shared/schema";
 
 describe("QuizController", () => {
   let controller: QuizController;
-  let storageService: StorageService;
+  let storageService: MemStorageService;
 
   const mockStorageService = {
     saveQuizAttempt: jest.fn(),
@@ -17,24 +19,24 @@ describe("QuizController", () => {
       controllers: [QuizController],
       providers: [
         {
-          provide: StorageService,
+          provide: MemStorageService,
           useValue: mockStorageService,
         },
       ],
     }).compile();
 
     controller = module.get(QuizController);
-    storageService = module.get(StorageService);
+    storageService = module.get(MemStorageService);
   });
 
   describe("saveAttempt", () => {
     it("should save a quiz attempt successfully", async () => {
-      const mockQuizData = {
+      const mockQuizData: InsertQuizAttempt = {
         userId: 1,
         tutorialId: "tutorial-1",
         score: 80,
-        totalQuestions: 10,
-        attemptedAt: new Date(),
+        attemptedAt: new Date().toISOString(),
+        answers: null
       };
 
       const mockSavedAttempt = {
@@ -51,12 +53,12 @@ describe("QuizController", () => {
     });
 
     it("should throw an HttpException when save fails", async () => {
-      const mockQuizData = {
+      const mockQuizData: InsertQuizAttempt = {
         userId: 1,
         tutorialId: "tutorial-1",
         score: 80,
-        totalQuestions: 10,
-        attemptedAt: new Date(),
+        attemptedAt: new Date().toISOString(),
+        answers: null
       };
 
       const errorMessage = "Failed to save quiz attempt";
@@ -81,7 +83,7 @@ describe("QuizController", () => {
           tutorialId,
           score: 80,
           totalQuestions: 10,
-          attemptedAt: new Date(),
+          attemptedAt: new Date().toISOString(),
         },
       ];
 

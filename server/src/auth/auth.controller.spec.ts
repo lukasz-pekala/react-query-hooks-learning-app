@@ -1,13 +1,15 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
-import { StorageService } from "../shared/storage.service";
+import { MemStorageService } from "../shared/mem-storage.service";
 import { HttpException, HttpStatus } from "@nestjs/common";
+import "reflect-metadata";
+import { InsertUser } from "shared/schema";
 
 describe("AuthController", () => {
   let controller: AuthController;
-  let storageService: StorageService;
+  let storageService: MemStorageService;
 
-  const mockStorageService = {
+  const mockMemStorageService = {
     createUser: jest.fn(),
     getUserByUsername: jest.fn(),
   };
@@ -17,19 +19,19 @@ describe("AuthController", () => {
       controllers: [AuthController],
       providers: [
         {
-          provide: StorageService,
-          useValue: mockStorageService,
+          provide: MemStorageService,
+          useValue: mockMemStorageService,
         },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-    storageService = module.get<StorageService>(StorageService);
+    storageService = module.get<MemStorageService>(MemStorageService);
   });
 
   describe("register", () => {
     it("should register a new user successfully", async () => {
-      const mockUserData = {
+      const mockUserData: InsertUser = {
         username: "testuser",
         password: "testpass",
       };
@@ -39,7 +41,7 @@ describe("AuthController", () => {
         username: "testuser",
       };
 
-      mockStorageService.createUser.mockResolvedValue(mockCreatedUser);
+      mockMemStorageService.createUser.mockResolvedValue(mockCreatedUser);
 
       const result = await controller.register(mockUserData);
 
@@ -48,13 +50,13 @@ describe("AuthController", () => {
     });
 
     it("should throw an HttpException when registration fails", async () => {
-      const mockUserData = {
+      const mockUserData: InsertUser = {
         username: "testuser",
         password: "testpass",
       };
 
       const errorMessage = "Failed to create user";
-      mockStorageService.createUser.mockRejectedValue(new Error(errorMessage));
+      mockMemStorageService.createUser.mockRejectedValue(new Error(errorMessage));
 
       await expect(controller.register(mockUserData)).rejects.toThrow(
         new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR)
@@ -64,7 +66,7 @@ describe("AuthController", () => {
 
   describe("login", () => {
     it("should login a user successfully", async () => {
-      const mockUserData = {
+      const mockUserData: InsertUser = {
         username: "testuser",
         password: "testpass",
       };
@@ -74,7 +76,7 @@ describe("AuthController", () => {
         ...mockUserData,
       };
 
-      mockStorageService.getUserByUsername.mockResolvedValue(mockUser);
+      mockMemStorageService.getUserByUsername.mockResolvedValue(mockUser);
 
       const result = await controller.login(mockUserData);
 
@@ -88,12 +90,12 @@ describe("AuthController", () => {
     });
 
     it("should throw an HttpException when user is not found", async () => {
-      const mockUserData = {
+      const mockUserData: InsertUser = {
         username: "testuser",
         password: "testpass",
       };
 
-      mockStorageService.getUserByUsername.mockResolvedValue(undefined);
+      mockMemStorageService.getUserByUsername.mockResolvedValue(undefined);
 
       await expect(controller.login(mockUserData)).rejects.toThrow(
         new HttpException("Invalid credentials", HttpStatus.UNAUTHORIZED)
@@ -101,7 +103,7 @@ describe("AuthController", () => {
     });
 
     it("should throw an HttpException when password is incorrect", async () => {
-      const mockUserData = {
+      const mockUserData: InsertUser = {
         username: "testuser",
         password: "wrongpass",
       };
@@ -112,7 +114,7 @@ describe("AuthController", () => {
         password: "testpass",
       };
 
-      mockStorageService.getUserByUsername.mockResolvedValue(mockUser);
+      mockMemStorageService.getUserByUsername.mockResolvedValue(mockUser);
 
       await expect(controller.login(mockUserData)).rejects.toThrow(
         new HttpException("Invalid credentials", HttpStatus.UNAUTHORIZED)
@@ -120,13 +122,13 @@ describe("AuthController", () => {
     });
 
     it("should throw an HttpException when login fails", async () => {
-      const mockUserData = {
+      const mockUserData: InsertUser = {
         username: "testuser",
         password: "testpass",
       };
 
       const errorMessage = "Database error";
-      mockStorageService.getUserByUsername.mockRejectedValue(
+      mockMemStorageService.getUserByUsername.mockRejectedValue(
         new Error(errorMessage)
       );
 

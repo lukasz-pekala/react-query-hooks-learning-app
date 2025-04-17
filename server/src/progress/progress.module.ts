@@ -5,6 +5,5 @@ import { SharedModule } from "../shared/shared.module";
 @Module({
   imports: [SharedModule],
   controllers: [ProgressController],
-  providers: [],
 })
 export class ProgressModule {}

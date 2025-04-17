@@ -7,11 +7,12 @@ import {
   HttpException,
   HttpStatus,
 } from "@nestjs/common";
-import { StorageService, InsertQuizAttempt } from "../shared/storage.service";
+import { MemStorageService } from "../shared/mem-storage.service";
+import { InsertQuizAttempt } from "shared/schema";
 
-@Controller("api/quiz")
+@Controller()
 export class QuizController {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(private readonly storageService: MemStorageService) {}
 
   @Post("attempt")
   async saveAttempt(@Body() quizData: InsertQuizAttempt) {

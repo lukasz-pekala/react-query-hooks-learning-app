@@ -1,11 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ProgressController } from "./progress.controller";
-import { StorageService } from "../shared/storage.service";
+import { MemStorageService } from "../shared/mem-storage.service";
 import { HttpException, HttpStatus } from "@nestjs/common";
+import { Progress } from "shared/schema";
+import "reflect-metadata";
 
 describe("ProgressController", () => {
   let controller: ProgressController;
-  let storageService: StorageService;
+  let storageService: MemStorageService;
 
   const mockStorageService = {
     getUserProgress: jest.fn(),
@@ -17,27 +19,27 @@ describe("ProgressController", () => {
       controllers: [ProgressController],
       providers: [
         {
-          provide: StorageService,
+          provide: MemStorageService,
           useValue: mockStorageService,
         },
       ],
     }).compile();
 
     controller = module.get<ProgressController>(ProgressController);
-    storageService = module.get<StorageService>(StorageService);
+    storageService = module.get<MemStorageService>(MemStorageService);
   });
 
   describe("getUserProgress", () => {
     it("should return user progress successfully", async () => {
       const userId = "1";
-      const mockProgress = [
+      const mockProgress: Progress[] = [
         {
           id: 1,
           userId: 1,
           tutorialId: "tutorial-1",
           completed: true,
           quizCompleted: true,
-          lastViewed: new Date(),
+          lastViewed: new Date().toISOString(),
         },
       ];
 
@@ -65,14 +67,14 @@ describe("ProgressController", () => {
     });
   });
 
-  describe("updateProgress", () => {
+  describe("updateUserProgress", () => {
     it("should update progress successfully", async () => {
       const mockProgressData = {
         userId: 1,
         tutorialId: "tutorial-1",
         completed: true,
         quizCompleted: true,
-        lastViewed: new Date(),
+        lastViewed: new Date().toISOString(),
       };
 
       const mockUpdatedProgress = {
@@ -84,7 +86,7 @@ describe("ProgressController", () => {
         mockUpdatedProgress
       );
 
-      const result = await controller.updateProgress(mockProgressData);
+      const result = await controller.updateUserProgress(mockProgressData);
 
       expect(result).toEqual(mockUpdatedProgress);
       expect(storageService.updateUserProgress).toHaveBeenCalledWith(
@@ -93,12 +95,13 @@ describe("ProgressController", () => {
     });
 
     it("should throw an HttpException when update fails", async () => {
-      const mockProgressData = {
+      const mockProgressData: Progress = {
         userId: 1,
         tutorialId: "tutorial-1",
         completed: true,
         quizCompleted: true,
-        lastViewed: new Date(),
+        lastViewed: new Date().toISOString(),
+        id: 0
       };
 
       const errorMessage = "Failed to update progress";
@@ -106,7 +109,9 @@ describe("ProgressController", () => {
         new Error(errorMessage)
       );
 
-      await expect(controller.updateProgress(mockProgressData)).rejects.toThrow(
+      await expect(
+        controller.updateUserProgress(mockProgressData)
+      ).rejects.toThrow(
         new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR)
       );
     });

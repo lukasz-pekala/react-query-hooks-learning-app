@@ -6,16 +6,20 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  UsePipes,
+  ValidationPipe,
 } from "@nestjs/common";
-import { StorageService, InsertProgress } from "../shared/storage.service";
+import { MemStorageService } from "../shared/mem-storage.service";
+import { InsertProgress } from "shared/schema";
 
-@Controller("api/progress")
+@Controller("progress")
 export class ProgressController {
-  constructor(private readonly storageService: StorageService) {}
+  constructor(private readonly storageService: MemStorageService) {}
 
   @Get(":userId")
   async getUserProgress(@Param("userId") userId: string) {
     try {
+      console.log("ProgressController: getUserProgress", userId);
       const progress = await this.storageService.getUserProgress(
         parseInt(userId)
       );
@@ -32,8 +36,10 @@ export class ProgressController {
   }
 
   @Post()
-  async updateProgress(@Body() progressData: InsertProgress) {
+  @UsePipes(new ValidationPipe())
+  async updateUserProgress(@Body() progressData: InsertProgress) {
     try {
+      // Validation is handled by ValidationPipe and the DTO
       const progress = await this.storageService.updateUserProgress(
         progressData
       );

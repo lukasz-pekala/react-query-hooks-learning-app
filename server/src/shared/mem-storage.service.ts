@@ -1,69 +1,15 @@
-import { Injectable } from "@nestjs/common";
-
-// The types should be imported from an appropriate location
-// For now we'll define them here directly
-export interface User {
-  id: number;
-  username: string;
-  password: string;
-}
-
-export interface InsertUser {
-  username: string;
-  password: string;
-}
-
-export interface Progress {
-  id: number;
-  userId: number;
-  tutorialId: string;
-  completed: boolean;
-  quizCompleted: boolean;
-  lastViewed: Date | null;
-}
-
-export interface InsertProgress {
-  userId: number;
-  tutorialId: string;
-  completed?: boolean;
-  quizCompleted?: boolean;
-  lastViewed?: Date | null;
-}
-
-export interface QuizAttempt {
-  id: number;
-  userId: number;
-  tutorialId: string;
-  score: number;
-  totalQuestions: number;
-  attemptedAt: Date;
-}
-
-export interface InsertQuizAttempt {
-  userId: number;
-  tutorialId: string;
-  score: number;
-  totalQuestions: number;
-  attemptedAt: Date;
-}
-
-export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-
-  // Progress methods
-  getUserProgress(userId: number): Promise<Progress[]>;
-  updateUserProgress(progress: InsertProgress): Promise<Progress>;
-
-  // Quiz attempt methods
-  saveQuizAttempt(quizAttempt: InsertQuizAttempt): Promise<QuizAttempt>;
-  getQuizAttempts(userId: number, tutorialId: string): Promise<QuizAttempt[]>;
-}
+import { Global, Injectable, OnModuleInit } from "@nestjs/common";
+import {
+  InsertProgress,
+  InsertQuizAttempt,
+  InsertUser,
+  Progress,
+  QuizAttempt,
+  User,
+} from "shared/schema";
 
 @Injectable()
-export class StorageService implements IStorage {
+export class MemStorageService implements OnModuleInit {
   private users: Map<number, User>;
   private progress: Map<number, Progress[]>;
   private quizAttempts: Map<number, QuizAttempt[]>;
@@ -78,9 +24,16 @@ export class StorageService implements IStorage {
     this.currentUserId = 1;
     this.currentProgressId = 1;
     this.currentQuizAttemptId = 1;
+  }
 
+  // Explanation:
+  // This is a method that is called when the module is initialized.
+  // It is used to add a default user for demonstration purposes.
+  // It must be async because it returns a Promise.
+  // We can't use the constructor to do this because the constructor is called synchronously.
+  async onModuleInit() {
     // Add a default user for demonstration purposes
-    this.createUser({ username: "demo", password: "demo" });
+    await this.createUser({ username: "demo", password: "demo" });
   }
 
   // User methods
@@ -103,6 +56,7 @@ export class StorageService implements IStorage {
 
   // Progress methods
   async getUserProgress(userId: number): Promise<Progress[]> {
+    console.log("getUserProgress", userId);
     return this.progress.get(userId) || [];
   }
 
