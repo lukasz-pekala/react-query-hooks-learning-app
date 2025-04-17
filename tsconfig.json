@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "incremental": true,
-    "noEmit": true,
     "module": "ESNext",
     "strict": true,
     "esModuleInterop": true,

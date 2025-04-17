@@ -1,4 +1,6 @@
 module.exports = {
+  preset: '@nestjs/jest',
+  testEnvironment: 'node',
   moduleFileExtensions: ["js", "json", "ts"],
   rootDir: "src",
   testRegex: ".*\\.spec\\.ts$",
@@ -7,7 +9,6 @@ module.exports = {
   },
   collectCoverageFrom: ["**/*.(t|j)s"],
   coverageDirectory: "../coverage",
-  testEnvironment: "node",
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },
